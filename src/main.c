@@ -63,7 +63,10 @@ int main(int argc, char** argv){
 
             for(uint32_t i = 0 ; i < tex->nWidth * tex->nHeight ; i++){
                 unsigned char* paletteIdx = palette + ((unsigned char)(indices[i])*3);
-                memcpy(image + i*3, paletteIdx, 3);                            
+                memcpy(image + i*3, paletteIdx, 3);   
+                *((unsigned char*)image + i*3 + 0) = *((unsigned char*)paletteIdx + 2);     
+                *((unsigned char*)image + i*3 + 1) = *((unsigned char*)paletteIdx + 1);              
+                *((unsigned char*)image + i*3 + 2) = *((unsigned char*)paletteIdx + 0);              
             }
 
             for(int j = 0 ; j < tex->nHeight; j++ ){
