@@ -276,9 +276,10 @@ int mip_n_n(const void * image, int width, int height,  void* output){
     
     int i,j,k;
     k = 0;
+
     for( i = 0 ; i < height/2; i++){
         for( j = 0 ; j < width/2; j++){
-            *((byte*)output + k) = *((byte*)image + i*height*2 + j*2);
+            *((byte*)output + k) = *((byte*)image + j*height*2 + i*2);
             k++;
         }
     }

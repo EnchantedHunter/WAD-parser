@@ -53,7 +53,6 @@ int main(int argc, char** argv){
     info->next = NULL;
 
     uint32_t nDir = 0;
-    uint32_t info_header_size = 0;
 
     while ((ent = readdir (dir)) != NULL) {
         if(strstr(ent->d_name, ".bmp")){
@@ -86,7 +85,6 @@ int main(int argc, char** argv){
             }
 
             void * payload = bmp + sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
-            
             void * payload_inv = malloc(w*h*3);
 
             for(int jj = 0 ; jj < h; jj++ ){
@@ -102,9 +100,9 @@ int main(int argc, char** argv){
             void * compressed_mip_1 = malloc(w * h / 4);
             void * compressed_mip_2 = malloc(w * h / 16);
             void * compressed_mip_3 = malloc(w * h / 64);
-
-            compress(payload_inv, w, h, compressed_mip_0, palette, 0);
             
+            compress(payload_inv, w, h, compressed_mip_0, palette, 0);
+
             mip_n_n(compressed_mip_0, w, h, compressed_mip_1);
             mip_n_n(compressed_mip_1, w/2, h/2, compressed_mip_2);
             mip_n_n(compressed_mip_2, w/4, h/4, compressed_mip_3);
@@ -127,8 +125,8 @@ int main(int argc, char** argv){
                 *ent = '\0';
             }
             direntry->bCompression = (unsigned char)0;
-            direntry->nSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 ; 
-            direntry->nDiskSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 ;
+            direntry->nSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ; 
+            direntry->nDiskSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ;
             direntry->nType = 'C';
 
             void * next = info;    
@@ -149,7 +147,6 @@ int main(int argc, char** argv){
             im_info->palette = palette_r;
             im_info->info_header = (void*) info_header;
 
-            info_header_size += sizeof(WADDIRENTRY);
             ((LINKEDLIST*)next)->next = (void*)im_info;
             nDir++;
         }
@@ -212,6 +209,7 @@ int main(int argc, char** argv){
         fwrite ( (void*)&texwad , 1, sizeof(BSPMIPTEXWAD), f);
 
         uint16_t pal_size = (uint16_t)256;
+        uint16_t padding = (uint16_t)0;
 
         fwrite ( list->mip_0 , 1, w*h, f);
         fwrite ( list->mip_1 , 1, w*h/4, f);
@@ -219,7 +217,7 @@ int main(int argc, char** argv){
         fwrite ( list->mip_3 , 1, w*h/64, f);
         fwrite ( &pal_size , 2, 1, f);
         fwrite ( list->palette , 1, 768, f);
-        fwrite ( &pal_size , 2, 1, f);
+        fwrite ( &padding , 2, 1, f);
 
         ll += w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 256*3 + 2;
         i++;

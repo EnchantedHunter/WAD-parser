@@ -9,7 +9,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include "wad.h"
 #include "utils.h"
@@ -31,7 +30,6 @@ void P_Bar_Step(int procent){
     printf("]%d",i*5);
     printf("\r");
     fflush(stdout);
-    usleep(59000u);
 }
 
 int main(int argc, char** argv){
@@ -57,13 +55,9 @@ int main(int argc, char** argv){
 
             unsigned char indices[tex->nWidth * tex->nHeight];
             memcpy(indices, wad + dir->nFilePos + *(tex->nOffsets + 0), tex->nWidth * tex->nHeight);
-            printf("%s\n", dir->szName);
 
             unsigned char palette[256*3];
             memcpy(palette, wad + dir->nFilePos + *(tex->nOffsets + 3) + ((tex->nWidth/8) * (tex->nHeight/8)) + 2, 256*3);
-
-
-            // printf("%u\n", *(short*)(wad + dir->nFilePos + *(tex->nOffsets + 3) + ((tex->nWidth/8) * (tex->nHeight/8))));
 
             for(uint32_t i = 0 ; i < tex->nWidth * tex->nHeight ; i++){
                 unsigned char* paletteIdx = palette + ((unsigned char)(indices[i])*3);
@@ -92,6 +86,7 @@ int main(int argc, char** argv){
         return 1;
     }
 
+    fflush(stdout);
     free(wad);
 
     return 0;
