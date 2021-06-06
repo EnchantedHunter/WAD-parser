@@ -57,9 +57,13 @@ int main(int argc, char** argv){
 
             unsigned char indices[tex->nWidth * tex->nHeight];
             memcpy(indices, wad + dir->nFilePos + *(tex->nOffsets + 0), tex->nWidth * tex->nHeight);
+            printf("%s\n", dir->szName);
 
             unsigned char palette[256*3];
             memcpy(palette, wad + dir->nFilePos + *(tex->nOffsets + 3) + ((tex->nWidth/8) * (tex->nHeight/8)) + 2, 256*3);
+
+
+            // printf("%u\n", *(short*)(wad + dir->nFilePos + *(tex->nOffsets + 3) + ((tex->nWidth/8) * (tex->nHeight/8))));
 
             for(uint32_t i = 0 ; i < tex->nWidth * tex->nHeight ; i++){
                 unsigned char* paletteIdx = palette + ((unsigned char)(indices[i])*3);

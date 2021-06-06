@@ -121,13 +121,14 @@ int main(int argc, char** argv){
 
             WADDIRENTRY* direntry = (WADDIRENTRY*)malloc(sizeof(WADDIRENTRY));
             strncpy(direntry->szName, ent->d_name, 12);
+            direntry->szName[11] = '\0';
             char * ent = strstr(direntry->szName, ".");
             if(ent!= NULL){
                 *ent = '\0';
             }
             direntry->bCompression = (unsigned char)0;
-            direntry->nSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768; 
-            direntry->nDiskSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768;
+            direntry->nSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 ; 
+            direntry->nDiskSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 ;
             direntry->nType = 'C';
 
             void * next = info;    
@@ -166,12 +167,18 @@ int main(int argc, char** argv){
 
     void* next = info->next;
     int i = 0;
+    int lll = 0;
 
     while(1){
-        ((WADDIRENTRY*)(((LINKEDLIST*)next)->data))->nFilePos = sizeof(WADHEADER) + nDir*sizeof(WADDIRENTRY) + i*sizeof(BSPMIPTEXWAD);
+        ((WADDIRENTRY*)(((LINKEDLIST*)next)->data))->nFilePos =
+         sizeof(WADHEADER) + nDir*sizeof(WADDIRENTRY) + lll;
         void * save_direntry = (void*) ((LINKEDLIST*)next)->data;
         fwrite ( save_direntry , 1, sizeof(WADDIRENTRY), f);
         i++;
+
+        uint32_t www = ((BITMAPINFOHEADER*)((LINKEDLIST*)next)->info_header)->biWidth;
+        uint32_t hhh = ((BITMAPINFOHEADER*)((LINKEDLIST*)next)->info_header)->biHeight;
+        lll += sizeof(BSPMIPTEXWAD) + www*hhh + www*hhh/4 + www*hhh/16 + www*hhh/64 + 2 + 768 + 2;
 
         if(((LINKEDLIST*)next)->next != NULL){
             next = ((LINKEDLIST*)next)->next; 
@@ -186,6 +193,7 @@ int main(int argc, char** argv){
 
         WADDIRENTRY * direntry = (WADDIRENTRY*) (((LINKEDLIST*)next)->data);
         BITMAPINFOHEADER * info_header = (BITMAPINFOHEADER*) (((LINKEDLIST*)next)->info_header);
+        LINKEDLIST* list = ((LINKEDLIST*)next);
 
         uint32_t w, h;
         w = info_header->biWidth;
@@ -196,49 +204,30 @@ int main(int argc, char** argv){
         texwad.szName[11] = '\0';
         texwad.nWidth = w;
         texwad.nHeight = h;
-        texwad.nOffsets[0] = (nDir-i)*sizeof(BSPMIPTEXWAD) + ll;
-        texwad.nOffsets[1] = (nDir-i)*sizeof(BSPMIPTEXWAD) + ll + w*h ;
-        texwad.nOffsets[2] = (nDir-i)*sizeof(BSPMIPTEXWAD) + ll + w*h + w*h/4;
-        texwad.nOffsets[3] = (nDir-i)*sizeof(BSPMIPTEXWAD) + ll + w*h + w*h/4 + w*h/16;
+        texwad.nOffsets[0] = sizeof(BSPMIPTEXWAD) ;
+        texwad.nOffsets[1] = sizeof(BSPMIPTEXWAD) + w*h ;
+        texwad.nOffsets[2] = sizeof(BSPMIPTEXWAD) + w*h + w*h/4;
+        texwad.nOffsets[3] = sizeof(BSPMIPTEXWAD) + w*h + w*h/4 + w*h/16;
 
         fwrite ( (void*)&texwad , 1, sizeof(BSPMIPTEXWAD), f);
 
-        ll += w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 256*3;
-        i++;
-
-        if(((LINKEDLIST*)next)->next != NULL){
-            next = ((LINKEDLIST*)next)->next; 
-        }else break;
-    }
-
-    // write mips
-
-    next = info->next;
-    i = 0;
-
-    while(1){
-        BITMAPINFOHEADER * info_header = (BITMAPINFOHEADER*) (((LINKEDLIST*)next)->info_header);
-        LINKEDLIST* list = ((LINKEDLIST*)next);
-        uint32_t w, h;
-        w = info_header->biWidth;
-        h = info_header->biHeight;
+        uint16_t pal_size = (uint16_t)256;
 
         fwrite ( list->mip_0 , 1, w*h, f);
         fwrite ( list->mip_1 , 1, w*h/4, f);
         fwrite ( list->mip_2 , 1, w*h/16, f);
         fwrite ( list->mip_3 , 1, w*h/64, f);
-        fwrite ( list->mip_0 , 1, 2, f);
+        fwrite ( &pal_size , 2, 1, f);
         fwrite ( list->palette , 1, 768, f);
+        fwrite ( &pal_size , 2, 1, f);
 
+        ll += w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 256*3 + 2;
         i++;
 
         if(((LINKEDLIST*)next)->next != NULL){
             next = ((LINKEDLIST*)next)->next; 
         }else break;
     }
-
-    /////////////
-
 
     fclose(f);
 
@@ -247,14 +236,6 @@ int main(int argc, char** argv){
         printf("Нет возможности открыть директорию.");
         return EXIT_FAILURE;
     }
-
-    // printf(" %ld \n", sizeof(defaultPalette));
-
-
-    // printf("%d %d \n", info_header->biWidth, info_header->biHeight);
-
-
-    // writeBytesFile(bmp, "output.bmp", bmp_len);
 
     return 0;
 }
