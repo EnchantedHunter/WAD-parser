@@ -37,7 +37,7 @@ void P_Bar_Step(int procent){
 int main(int argc, char** argv){
 
     if(argc != 2){
-        printf("Введит путь до WAD файла!\n");
+        printf("Введите путь до WAD файла!\n");
         return 1;
     }
 
@@ -52,7 +52,7 @@ int main(int argc, char** argv){
         for(i = 0 ; i < header->nDir; i++){
             WADDIRENTRY* dir = (WADDIRENTRY*)(wad + header->nDirOffset + sizeof(WADDIRENTRY)*i);
             BSPMIPTEXWAD* tex = (BSPMIPTEXWAD*)(wad + dir->nFilePos);
-            
+
             void* image = malloc(tex->nWidth * tex->nHeight * 3 * 2);
 
             unsigned char indices[tex->nWidth * tex->nHeight];

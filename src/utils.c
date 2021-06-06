@@ -49,5 +49,4 @@ void writeBytesFile(unsigned char* data, char* file, int counts){
         fputs("Error write file", stderr);
     }
     fclose(f);
-
 }
