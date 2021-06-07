@@ -101,7 +101,7 @@ int main(int argc, char** argv){
             void * compressed_mip_2 = malloc(w * h / 16);
             void * compressed_mip_3 = malloc(w * h / 64);
             
-            compress(payload_inv, w, h, compressed_mip_0, palette, 0);
+            compress(payload_inv, w, h, compressed_mip_0, palette, 1);
 
             mip_n_n(compressed_mip_0, w, h, compressed_mip_1);
             mip_n_n(compressed_mip_1, w/2, h/2, compressed_mip_2);
@@ -119,14 +119,14 @@ int main(int argc, char** argv){
 
             WADDIRENTRY* direntry = (WADDIRENTRY*)malloc(sizeof(WADDIRENTRY));
             strncpy(direntry->szName, ent->d_name, 12);
-            direntry->szName[11] = '\0';
+            direntry->szName[12] = '\0';
             char * ent = strstr(direntry->szName, ".");
             if(ent!= NULL){
                 *ent = '\0';
             }
             direntry->bCompression = (unsigned char)0;
-            direntry->nSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ; 
-            direntry->nDiskSize = w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ;
+            direntry->nSize = sizeof(BSPMIPTEXWAD) + w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ; 
+            direntry->nDiskSize = sizeof(BSPMIPTEXWAD) + w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2 ;
             direntry->nType = 'C';
 
             void * next = info;    
@@ -169,6 +169,7 @@ int main(int argc, char** argv){
     while(1){
         ((WADDIRENTRY*)(((LINKEDLIST*)next)->data))->nFilePos =
          sizeof(WADHEADER) + nDir*sizeof(WADDIRENTRY) + lll;
+
         void * save_direntry = (void*) ((LINKEDLIST*)next)->data;
         fwrite ( save_direntry , 1, sizeof(WADDIRENTRY), f);
         i++;
@@ -198,7 +199,7 @@ int main(int argc, char** argv){
 
         BSPMIPTEXWAD texwad;
         strncpy(texwad.szName, direntry->szName, 12);
-        texwad.szName[11] = '\0';
+        texwad.szName[12] = '\0';
         texwad.nWidth = w;
         texwad.nHeight = h;
         texwad.nOffsets[0] = sizeof(BSPMIPTEXWAD) ;
@@ -219,7 +220,7 @@ int main(int argc, char** argv){
         fwrite ( list->palette , 1, 768, f);
         fwrite ( &padding , 2, 1, f);
 
-        ll += w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 256*3 + 2;
+        ll += w*h + w*h/4 + w*h/16 + w*h/64 + 2 + 768 + 2;
         i++;
 
         if(((LINKEDLIST*)next)->next != NULL){

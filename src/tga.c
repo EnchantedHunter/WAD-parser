@@ -307,9 +307,22 @@ int compress(const void * image, int width, int height, void* output, void* pale
                 color_number = j;
 
                 if(change_palette){
-                    *((byte*)palette + j*3 + 0) = (byte)(((int)*((byte*)palette + j*3 + 0) + (int)r)/2.0);
-                    *((byte*)palette + j*3 + 1) = (byte)(((int)*((byte*)palette + j*3 + 1) + (int)g)/2.0);
-                    *((byte*)palette + j*3 + 2) = (byte)(((int)*((byte*)palette + j*3 + 2) + (int)b)/2.0);
+                    
+                    double pr = (((int)*((byte*)palette + j*3 + 0)) * 1.0);
+                    double pg = (((int)*((byte*)palette + j*3 + 1)) * 1.0);
+                    double pb = (((int)*((byte*)palette + j*3 + 2)) * 1.0);
+
+                    double nr = (((int)r + j*3 + 0) * 1.0);
+                    double ng = (((int)g + j*3 + 1) * 1.0);
+                    double nb = (((int)b + j*3 + 2) * 1.0);
+
+                    pr = pr + (-pr + nr)/100000.0;
+                    pg = pg + (-pg + ng)/100000.0;
+                    pb = pb + (-pb + nb)/100000.0;
+
+                    *((byte*)palette + j*3 + 0) = (byte) ((int)pr);
+                    *((byte*)palette + j*3 + 1) = (byte) ((int)pg);
+                    *((byte*)palette + j*3 + 2) = (byte) ((int)pb);
                 }
             }
             
