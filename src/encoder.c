@@ -59,7 +59,7 @@ int main(int argc, char** argv){
 
             printf ("%s\n", ent->d_name);
             
-            char path_name_ext[sizeof(argv[1]) + ent->d_namlen + 2 ];  
+            char path_name_ext[sizeof(argv[1]) + strlen(ent->d_name) + 2 ];  
             sprintf(path_name_ext, "%s/%s", argv[1], ent->d_name);
 
             uint32_t bmp_len;
