@@ -102,6 +102,7 @@ int main(int argc, char** argv){
             void * compressed_mip_3 = malloc(w * h / 64);
             
             compress(payload_inv, w, h, compressed_mip_0, palette, 1);
+            compress(payload_inv, w, h, compressed_mip_0, palette, 0);
 
             mip_n_n(compressed_mip_0, w, h, compressed_mip_1);
             mip_n_n(compressed_mip_1, w/2, h/2, compressed_mip_2);
